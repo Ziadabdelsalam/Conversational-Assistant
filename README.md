@@ -1,7 +1,7 @@
-CONVERSATIONAL ASSISTANT WITH GPT-4o-MINI
+CONVERSATIONAL ASSISTANT 
 ==========================================
 
-A sophisticated conversational assistant built with LangChain and GPT-4o-mini that can schedule meetings and send emails through natural language interaction.
+A conversational assistant built with LangChain and GPT-4o-mini that can schedule meetings and send emails through natural language interaction.
 
 
 FEATURES
