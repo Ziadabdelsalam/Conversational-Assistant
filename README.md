@@ -140,6 +140,12 @@ Email Example:
 }
 
 
+
+
+WORKFLOW GRAPH
+---------------
+<img width="561" height="833" alt="Conversational Assistant  drawio" src="https://github.com/user-attachments/assets/09dc9af3-ddaa-45df-ae05-2271bb4cc3a6" />
+
 TROUBLESHOOTING
 ---------------
 
