@@ -11,3 +11,4 @@ uvicorn[standard]
 python-multipart
 websockets
 python-dateutil
+httpx==0.25.0

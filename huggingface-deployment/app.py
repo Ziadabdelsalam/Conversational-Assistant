@@ -1,5 +1,3 @@
-import os
-import gradio as gr
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -8,6 +6,7 @@ import uvicorn
 import json
 import uuid
 from datetime import datetime
+import os
 
 # Import your existing modules
 from agents.intent_classifier import IntentClassifierAgent
@@ -19,13 +18,17 @@ from executors.action_executor import ActionExecutor
 from state.conversation_state import ConversationContext
 from config import Config
 
-# Create FastAPI app
-app = FastAPI(title="AI Assistant API", version="1.0.0")
+app = FastAPI(
+    title="AI Assistant API", 
+    version="1.0.0",
+    docs_url="/docs",  # Swagger UI available at /docs
+    redoc_url="/redoc"  # ReDoc available at /redoc
+)
 
-# Enable CORS for mobile app
+# Enable CORS for mobile app - IMPORTANT!
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Allow all origins for mobile app
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -41,7 +44,8 @@ correction_chain = CorrectionChain(dialog_agent.llm)
 # Store session states
 session_states = {}
 
-# Request/Response Models
+# [Keep all your existing models and endpoints exactly as they are]
+
 class ChatRequest(BaseModel):
     message: str
     session_id: str
@@ -66,22 +70,20 @@ class ActionConfirmation(BaseModel):
     session_id: str
     confirmed: bool
 
-# [Keep all your existing API endpoints here - copy them from your original file]
-# @app.get("/")
-# @app.post("/chat")
-# @app.post("/confirm-action")
-# @app.get("/session/{session_id}")
-# @app.delete("/session/{session_id}")
-# @app.get("/health")
-# @app.websocket("/ws/{session_id}")
 
-# API Endpoints
 @app.get("/")
 async def root():
     return {
         "message": "AI Assistant API", 
         "status": "online",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "endpoints": {
+            "chat": "/chat",
+            "confirm": "/confirm-action",
+            "session": "/session/{session_id}",
+            "health": "/health",
+            "docs": "/docs"
+        }
     }
 
 @app.post("/chat", response_model=ChatResponse)
@@ -314,10 +316,11 @@ iface = gr.Interface(
     description="Chat with the AI Assistant to schedule meetings and send emails"
 )
 
-# Mount FastAPI app to Gradio
-gr.mount_gradio_app(app, iface, path="/gradio")
-
-# Important: This is required for Hugging Face Spaces
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+    # Port 7860 is required for Hugging Face Spaces
+    uvicorn.run(
+        app, 
+        host="0.0.0.0", 
+        port=7860,
+        log_level="info"
+    )
