@@ -1,0 +1,13 @@
+langchain
+langchain-openai
+langgraph
+gradio
+pydantic
+python-dotenv
+pandas
+tiktoken
+fastapi
+uvicorn[standard]
+python-multipart
+websockets
+python-dateutil

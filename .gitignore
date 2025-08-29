@@ -1,6 +1,6 @@
 .env
-CNTXT
-CNTXT/*
+myenv
+myenv/*
 __pycache__
 *.pyc
 *.pyo

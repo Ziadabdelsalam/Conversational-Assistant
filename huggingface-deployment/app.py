@@ -1,3 +1,5 @@
+import os
+import gradio as gr
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -17,6 +19,7 @@ from executors.action_executor import ActionExecutor
 from state.conversation_state import ConversationContext
 from config import Config
 
+# Create FastAPI app
 app = FastAPI(title="AI Assistant API", version="1.0.0")
 
 # Enable CORS for mobile app
@@ -62,6 +65,15 @@ class SessionInfo(BaseModel):
 class ActionConfirmation(BaseModel):
     session_id: str
     confirmed: bool
+
+# [Keep all your existing API endpoints here - copy them from your original file]
+# @app.get("/")
+# @app.post("/chat")
+# @app.post("/confirm-action")
+# @app.get("/session/{session_id}")
+# @app.delete("/session/{session_id}")
+# @app.get("/health")
+# @app.websocket("/ws/{session_id}")
 
 # API Endpoints
 @app.get("/")
@@ -262,23 +274,50 @@ async def health_check():
         "active_sessions": len(session_states)
     }
 
-# WebSocket for real-time chat (optional but nice to have)
 @app.websocket("/ws/{session_id}")
 async def websocket_endpoint(websocket: WebSocket, session_id: str):
     await websocket.accept()
     try:
         while True:
             data = await websocket.receive_text()
-            # Process message
             request = ChatRequest(message=data, session_id=session_id)
             response = await chat(request)
             await websocket.send_json(response.dict())
     except WebSocketDisconnect:
         print(f"Client {session_id} disconnected")
 
+# Add Gradio interface for testing
+def chat_interface(message, session_id="gradio-test"):
+    """Gradio chat interface for testing"""
+    import requests
+    import json
+    
+    try:
+        response = requests.post(
+            "http://localhost:7860/chat",
+            json={"message": message, "session_id": session_id}
+        )
+        if response.status_code == 200:
+            data = response.json()
+            return data["response"]
+        else:
+            return f"Error: {response.status_code}"
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+# Create Gradio interface
+iface = gr.Interface(
+    fn=chat_interface,
+    inputs=gr.Textbox(placeholder="Enter your message here..."),
+    outputs="text",
+    title="AI Assistant",
+    description="Chat with the AI Assistant to schedule meetings and send emails"
+)
+
+# Mount FastAPI app to Gradio
+gr.mount_gradio_app(app, iface, path="/gradio")
+
+# Important: This is required for Hugging Face Spaces
 if __name__ == "__main__":
-    uvicorn.run(
-        app, 
-        host="0.0.0.0", 
-        port=8000
-                )
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=7860)

@@ -1,0 +1,13 @@
+{
+  "type": "meeting",
+  "timestamp": "2025-08-28T18:21:32.388907",
+  "data": {
+    "title": "project sync",
+    "date": "2025-08-29",
+    "time": "15:00",
+    "participants": [
+      "sara@example.com"
+    ]
+  },
+  "status": "scheduled"
+}
