@@ -288,33 +288,6 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
     except WebSocketDisconnect:
         print(f"Client {session_id} disconnected")
 
-# Add Gradio interface for testing
-def chat_interface(message, session_id="gradio-test"):
-    """Gradio chat interface for testing"""
-    import requests
-    import json
-    
-    try:
-        response = requests.post(
-            "http://localhost:7860/chat",
-            json={"message": message, "session_id": session_id}
-        )
-        if response.status_code == 200:
-            data = response.json()
-            return data["response"]
-        else:
-            return f"Error: {response.status_code}"
-    except Exception as e:
-        return f"Error: {str(e)}"
-
-# Create Gradio interface
-iface = gr.Interface(
-    fn=chat_interface,
-    inputs=gr.Textbox(placeholder="Enter your message here..."),
-    outputs="text",
-    title="AI Assistant",
-    description="Chat with the AI Assistant to schedule meetings and send emails"
-)
 
 if __name__ == "__main__":
     # Port 7860 is required for Hugging Face Spaces
